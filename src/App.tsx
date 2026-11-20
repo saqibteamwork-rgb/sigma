@@ -1,6 +1,6 @@
 'use client';
 
-import { lazy, Suspense, useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import { ChevronRight, Cpu, KeyRound, MessageCircle, Server, Terminal } from 'lucide-react';
 import {
@@ -18,19 +18,10 @@ import { PairingHeroCard } from './components/PairingHeroCard';
 import { ClusterRouterPanel } from './components/ClusterRouterPanel';
 import { sweepClusterHealthDirect } from './lib/botClusterClient';
 
-// Lazy-load below-the-fold, secondary mobile tabs, and dedicated SEO pages for zero initial overhead
-const DeviceTelemetryStrip = lazy(() =>
-  import('./components/DeviceTelemetryStrip').then((m) => ({ default: m.DeviceTelemetryStrip }))
-);
-const CommandsShowcasePanel = lazy(() =>
-  import('./components/CommandsShowcasePanel').then((m) => ({ default: m.CommandsShowcasePanel }))
-);
-const DeveloperHubPanel = lazy(() =>
-  import('./components/DeveloperHubPanel').then((m) => ({ default: m.DeveloperHubPanel }))
-);
-const SeoPagesView = lazy(() =>
-  import('./components/SeoPagesView').then((m) => ({ default: m.SeoPagesView }))
-);
+import { DeviceTelemetryStrip } from './components/DeviceTelemetryStrip';
+import { CommandsShowcasePanel } from './components/CommandsShowcasePanel';
+import { DeveloperHubPanel } from './components/DeveloperHubPanel';
+import { SeoPagesView } from './components/SeoPagesView';
 
 type MobileSection = 'pair' | 'cluster' | 'commands' | 'system';
 type AppRoute = '/' | SeoRoutePath;
@@ -49,23 +40,6 @@ function nowTimeStr() {
     minute: '2-digit',
     second: '2-digit',
   });
-}
-
-function PanelSkeleton({ heightClass = 'h-48' }: { heightClass?: string }) {
-  return (
-    <div
-      aria-hidden="true"
-      className={`liquid-card rounded-[28px] p-6 ${heightClass} animate-pulse flex flex-col justify-between`}
-    >
-      <div className="h-5 w-44 rounded-lg bg-white/70" />
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <div className="h-14 rounded-2xl bg-white/60" />
-        <div className="h-14 rounded-2xl bg-white/60" />
-        <div className="h-14 rounded-2xl bg-white/60" />
-        <div className="h-14 rounded-2xl bg-white/60" />
-      </div>
-    </div>
-  );
 }
 
 export default function App() {
@@ -265,7 +239,6 @@ export default function App() {
         navigateTo('/');
       }
       setMobileTab(next);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
     },
     [route, navigateTo]
   );
@@ -390,15 +363,13 @@ export default function App() {
         {isSeoSubPage ? (
           /* Dedicated SEO Information Pages (/about, /whatsapp-bot, /faq) */
           <div className="w-full max-w-5xl mx-auto">
-            <Suspense fallback={<PanelSkeleton heightClass="h-96" />}>
-              <SeoPagesView
-                currentPath={route}
-                profile={profile}
-                onlineCount={onlineCount}
-                totalNodes={nodes.length}
-                onNavigate={navigateTo}
-              />
-            </Suspense>
+            <SeoPagesView
+              currentPath={route}
+              profile={profile}
+              onlineCount={onlineCount}
+              totalNodes={nodes.length}
+              onNavigate={navigateTo}
+            />
           </div>
         ) : (
           <>
@@ -429,25 +400,19 @@ export default function App() {
                 </div>
               </div>
 
-              <Suspense fallback={<PanelSkeleton heightClass="h-64" />}>
-                <DeviceTelemetryStrip
-                  onlineCount={onlineCount}
-                  totalNodes={nodes.length}
-                  totalPaired={totalPaired}
-                />
-              </Suspense>
+              <DeviceTelemetryStrip
+                onlineCount={onlineCount}
+                totalNodes={nodes.length}
+                totalPaired={totalPaired}
+              />
 
-              <Suspense fallback={<PanelSkeleton heightClass="h-56" />}>
-                <CommandsShowcasePanel onCopyCommand={handleCopyCommand} />
-              </Suspense>
+              <CommandsShowcasePanel onCopyCommand={handleCopyCommand} />
 
-              <Suspense fallback={<PanelSkeleton heightClass="h-56" />}>
-                <DeveloperHubPanel
-                  profile={profile}
-                  logs={logs}
-                  onClearLogs={handleClearLogs}
-                />
-              </Suspense>
+              <DeveloperHubPanel
+                profile={profile}
+                logs={logs}
+                onClearLogs={handleClearLogs}
+              />
 
               {/* Quiet Editorial Footer with Real Crawlable Links to Dedicated SEO Pages */}
               <footer className="pt-2 pb-6 flex flex-wrap items-center justify-between gap-4 text-[12.5px] font-medium text-[#5a6f8e]">
@@ -500,121 +465,84 @@ export default function App() {
               </footer>
             </div>
 
-            {/* Mobile Smooth Animated Tabbed Liquid Glass Experience */}
+            {/* Mobile Instant Responsive Tabbed Liquid Glass Experience */}
             <div className="lg:hidden w-full max-w-[560px] mx-auto">
-              <AnimatePresence mode="wait" initial={false}>
-                {mobileTab === 'pair' && (
-                  <motion.div
-                    key="mobile-pair"
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -8 }}
-                    transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
-                    className="space-y-3.5"
+              <div className={mobileTab === 'pair' ? 'space-y-3.5 tab-panel-active' : 'hidden'}>
+                <PairingHeroCard
+                  routingMode={routingMode}
+                  nodes={nodes}
+                  onlineCount={onlineCount}
+                  totalPaired={totalPaired}
+                  onLog={addLog}
+                  onToast={showToast}
+                  onJumpToCluster={() => handleSwitchMobileTab('cluster')}
+                />
+
+                <div className="grid grid-cols-2 gap-2.5">
+                  <button
+                    type="button"
+                    onClick={() => handleSwitchMobileTab('cluster')}
+                    className="liquid-card min-h-[68px] rounded-[20px] p-3.5 text-left flex items-center justify-between gap-2 active:scale-[0.97] transition-transform cursor-pointer"
                   >
-                    <PairingHeroCard
-                      routingMode={routingMode}
-                      nodes={nodes}
-                      onlineCount={onlineCount}
-                      totalPaired={totalPaired}
-                      onLog={addLog}
-                      onToast={showToast}
-                      onJumpToCluster={() => handleSwitchMobileTab('cluster')}
-                    />
-
-                    <div className="grid grid-cols-2 gap-2.5">
-                      <button
-                        type="button"
-                        onClick={() => handleSwitchMobileTab('cluster')}
-                        className="liquid-card min-h-[68px] rounded-[20px] p-3.5 text-left flex items-center justify-between gap-2 active:scale-[0.97] transition-transform cursor-pointer"
-                      >
-                        <div className="min-w-0">
-                          <div className="text-[11px] font-semibold text-[#526582]">Active Route</div>
-                          <div className="text-[13px] font-extrabold text-[#141d30] truncate mt-0.5">
-                            {selectedNodeLabel}
-                          </div>
-                          <div className="text-[11px] font-semibold text-[#0b8d70] tabular-nums">
-                            {onlineCount}/{nodes.length} online
-                          </div>
-                        </div>
-                        <ChevronRight className="w-4 h-4 text-[#617696] shrink-0" />
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={() => handleSwitchMobileTab('commands')}
-                        className="liquid-card min-h-[68px] rounded-[20px] p-3.5 text-left flex items-center justify-between gap-2 active:scale-[0.97] transition-transform cursor-pointer"
-                      >
-                        <div className="min-w-0">
-                          <div className="text-[11px] font-semibold text-[#526582]">Bot Commands</div>
-                          <div className="text-[13px] font-extrabold text-[#141d30] truncate mt-0.5">
-                            700+ Ready
-                          </div>
-                          <div className="text-[11px] font-semibold text-[#226bff]">
-                            Tap to browse
-                          </div>
-                        </div>
-                        <ChevronRight className="w-4 h-4 text-[#617696] shrink-0" />
-                      </button>
+                    <div className="min-w-0">
+                      <div className="text-[11px] font-semibold text-[#526582]">Active Route</div>
+                      <div className="text-[13px] font-extrabold text-[#141d30] truncate mt-0.5">
+                        {selectedNodeLabel}
+                      </div>
+                      <div className="text-[11px] font-semibold text-[#0b8d70] tabular-nums">
+                        {onlineCount}/{nodes.length} online
+                      </div>
                     </div>
-                  </motion.div>
-                )}
+                    <ChevronRight className="w-4 h-4 text-[#617696] shrink-0" />
+                  </button>
 
-                {mobileTab === 'cluster' && (
-                  <motion.div
-                    key="mobile-cluster"
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -8 }}
-                    transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
+                  <button
+                    type="button"
+                    onClick={() => handleSwitchMobileTab('commands')}
+                    className="liquid-card min-h-[68px] rounded-[20px] p-3.5 text-left flex items-center justify-between gap-2 active:scale-[0.97] transition-transform cursor-pointer"
                   >
-                    <ClusterRouterPanel
-                      nodes={nodes}
-                      onlineCount={onlineCount}
-                      totalPaired={totalPaired}
-                      routingMode={routingMode}
-                      isChecking={isCheckingCluster}
-                      onSelectRouting={handleSelectRouting}
-                      onRefreshHealth={handleManualRefresh}
-                    />
-                  </motion.div>
-                )}
+                    <div className="min-w-0">
+                      <div className="text-[11px] font-semibold text-[#526582]">Bot Commands</div>
+                      <div className="text-[13px] font-extrabold text-[#141d30] truncate mt-0.5">
+                        700+ Ready
+                      </div>
+                      <div className="text-[11px] font-semibold text-[#226bff]">
+                        Tap to browse
+                      </div>
+                    </div>
+                    <ChevronRight className="w-4 h-4 text-[#617696] shrink-0" />
+                  </button>
+                </div>
+              </div>
 
-                {mobileTab === 'commands' && (
-                  <motion.div
-                    key="mobile-commands"
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -8 }}
-                    transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
-                  >
-                    <Suspense fallback={<PanelSkeleton heightClass="h-72" />}>
-                      <CommandsShowcasePanel onCopyCommand={handleCopyCommand} />
-                    </Suspense>
-                  </motion.div>
-                )}
+              <div className={mobileTab === 'cluster' ? 'tab-panel-active' : 'hidden'}>
+                <ClusterRouterPanel
+                  nodes={nodes}
+                  onlineCount={onlineCount}
+                  totalPaired={totalPaired}
+                  routingMode={routingMode}
+                  isChecking={isCheckingCluster}
+                  onSelectRouting={handleSelectRouting}
+                  onRefreshHealth={handleManualRefresh}
+                />
+              </div>
 
-                {mobileTab === 'system' && (
-                  <motion.div
-                    key="mobile-system"
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -8 }}
-                    transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
-                    className="space-y-4"
-                  >
-                    <Suspense fallback={<PanelSkeleton heightClass="h-64" />}>
-                      <DeviceTelemetryStrip
-                        onlineCount={onlineCount}
-                        totalNodes={nodes.length}
-                        totalPaired={totalPaired}
-                      />
-                      <DeveloperHubPanel
-                        profile={profile}
-                        logs={logs}
-                        onClearLogs={handleClearLogs}
-                      />
-                    </Suspense>
+              <div className={mobileTab === 'commands' ? 'tab-panel-active' : 'hidden'}>
+                <CommandsShowcasePanel onCopyCommand={handleCopyCommand} />
+              </div>
+
+              <div className={mobileTab === 'system' ? 'space-y-4 tab-panel-active' : 'hidden'}>
+                <DeviceTelemetryStrip
+                  onlineCount={onlineCount}
+                  totalNodes={nodes.length}
+                  totalPaired={totalPaired}
+                />
+                <DeveloperHubPanel
+                  profile={profile}
+                  logs={logs}
+                  onClearLogs={handleClearLogs}
+                />
+              </div>
 
                     {/* Quiet Mobile Info Footer Links to Dedicated SEO Pages */}
                     <footer className="pt-1 pb-2 flex items-center justify-center gap-3 text-[12px] font-semibold text-[#5a6f8e]">
@@ -651,9 +579,6 @@ export default function App() {
                         FAQ
                       </a>
                     </footer>
-                  </motion.div>
-                )}
-              </AnimatePresence>
             </div>
           </>
         )}
@@ -679,16 +604,12 @@ export default function App() {
                 key={key}
                 type="button"
                 onClick={() => handleSwitchMobileTab(key)}
-                className={`relative min-h-[50px] rounded-[16px] flex flex-col items-center justify-center gap-0.5 text-[11px] font-bold transition-colors active:scale-95 cursor-pointer whitespace-nowrap ${
+                className={`relative min-h-[50px] rounded-[16px] flex flex-col items-center justify-center gap-0.5 text-[11px] font-bold transition-all active:scale-95 cursor-pointer whitespace-nowrap ${
                   active ? 'text-[#226bff]' : 'text-[#5b6f8d]'
                 }`}
               >
                 {active && (
-                  <motion.span
-                    layoutId="mobileBottomNavPill"
-                    transition={{ type: 'spring', stiffness: 440, damping: 34 }}
-                    className="absolute inset-x-1.5 inset-y-0.5 rounded-[14px] bg-white/85 border border-white/95 shadow-sm -z-10"
-                  />
+                  <span className="absolute inset-x-1.5 inset-y-0.5 rounded-[14px] bg-white/85 border border-white/95 shadow-sm -z-10 transition-all duration-150" />
                 )}
                 <Icon className="w-[19px] h-[19px]" />
                 <span>{label}</span>
