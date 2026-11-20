@@ -1,0 +1,1638 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Liquid Glass — Users Analytics UI</title>
+  <!-- Load Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Load Inter Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+          },
+        },
+      },
+    };
+  </script>
+
+  <style>
+    /* ==========================================================================
+       LIQUID GLASS OPTICAL & ATMOSPHERIC STYLING
+       Crafted for realistic translucent refraction, specular edges, and smooth
+       60fps interactions across desktop and mobile viewports.
+       ========================================================================== */
+    :root {
+      --bg-base: #eef5fc;
+      --ink-primary: #141d30;
+      --ink-muted: #5a6a85;
+      --accent-mint: #0ec89c;
+      --accent-blue: #226bff;
+      --glass-border: rgba(255, 255, 255, 0.85);
+    }
+
+    * {
+      -webkit-tap-highlight-color: transparent;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background:
+        radial-gradient(circle at 14% 12%, rgba(164, 198, 255, 0.45) 0%, rgba(238, 245, 252, 0) 48%),
+        radial-gradient(circle at 88% 85%, rgba(114, 234, 224, 0.42) 0%, rgba(238, 245, 252, 0) 52%),
+        radial-gradient(circle at 50% 50%, #f7fbff 0%, #e7f0fb 100%);
+      color: var(--ink-primary);
+      overflow-x: hidden;
+    }
+
+    /* Ambient 3D Liquid Glass Spheres & Caustic Blobs */
+    @keyframes floatSlow {
+      0%, 100% { transform: translate3d(0, 0, 0) rotate(0deg); }
+      50% { transform: translate3d(10px, -16px, 0) rotate(2.5deg); }
+    }
+
+    @keyframes floatReverse {
+      0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+      50% { transform: translate3d(-12px, 14px, 0) scale(1.03); }
+    }
+
+    @keyframes floatBubble {
+      0%, 100% { transform: translate3d(0, 0, 0); }
+      50% { transform: translate3d(-8px, -12px, 0); }
+    }
+
+    .orb-float-1 { animation: floatSlow 11s ease-in-out infinite; }
+    .orb-float-2 { animation: floatReverse 13s ease-in-out infinite; }
+    .orb-float-3 { animation: floatBubble 9s ease-in-out infinite; }
+
+    /* Top-left large sculpted liquid blue glass lobe */
+    .glass-orb-tl {
+      background:
+        radial-gradient(circle at 30% 25%, rgba(255, 255, 255, 0.85) 0%, rgba(154, 194, 255, 0.55) 26%, rgba(86, 134, 255, 0.72) 64%, rgba(62, 102, 232, 0.85) 100%);
+      box-shadow:
+        inset -16px -20px 36px rgba(42, 76, 210, 0.48),
+        inset 14px 16px 32px rgba(255, 255, 255, 0.9),
+        inset 0 -3px 10px rgba(135, 215, 255, 0.8),
+        0 28px 65px rgba(74, 122, 240, 0.34);
+      border: 1.5px solid rgba(255, 255, 255, 0.75);
+    }
+
+    /* Bottom-right translucent cyan/aqua liquid bubble */
+    .glass-orb-br-lg {
+      background:
+        radial-gradient(circle at 32% 28%, rgba(255, 255, 255, 0.88) 0%, rgba(182, 240, 245, 0.52) 34%, rgba(108, 208, 232, 0.55) 72%, rgba(96, 165, 250, 0.62) 100%);
+      box-shadow:
+        inset -14px -18px 34px rgba(52, 162, 215, 0.32),
+        inset 12px 14px 28px rgba(255, 255, 255, 0.92),
+        0 24px 60px rgba(72, 198, 212, 0.25);
+      border: 1.5px solid rgba(255, 255, 255, 0.8);
+    }
+
+    /* Small crisp iridescent water droplet sphere (bottom-right foreground) */
+    .glass-orb-droplet {
+      background:
+        radial-gradient(circle at 28% 24%, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.1) 24%, rgba(65, 168, 255, 0.45) 56%, rgba(44, 224, 198, 0.68) 82%, rgba(84, 118, 255, 0.78) 100%);
+      box-shadow:
+        inset -10px -12px 20px rgba(16, 198, 178, 0.52),
+        inset 8px 10px 18px rgba(255, 255, 255, 0.95),
+        inset 0 -4px 10px rgba(255, 255, 255, 0.65),
+        0 18px 36px rgba(48, 164, 218, 0.28);
+      border: 1.5px solid rgba(255, 255, 255, 0.85);
+    }
+
+    /* Bottom-left pale glass fluid shape */
+    .glass-orb-bl {
+      background:
+        radial-gradient(circle at 65% 30%, rgba(255, 255, 255, 0.82) 0%, rgba(200, 222, 255, 0.48) 45%, rgba(135, 172, 248, 0.55) 100%);
+      box-shadow:
+        inset -12px -12px 26px rgba(102, 140, 232, 0.28),
+        inset 12px 12px 24px rgba(255, 255, 255, 0.9),
+        0 20px 45px rgba(112, 150, 230, 0.2);
+      border: 1.5px solid rgba(255, 255, 255, 0.78);
+    }
+
+    /* Main Frosted Liquid Glass Card */
+    .liquid-card {
+      position: relative;
+      background: linear-gradient(
+        145deg,
+        rgba(255, 255, 255, 0.74) 0%,
+        rgba(242, 248, 255, 0.56) 48%,
+        rgba(232, 247, 252, 0.66) 100%
+      );
+      backdrop-filter: blur(28px) saturate(165%);
+      -webkit-backdrop-filter: blur(28px) saturate(165%);
+      border: 2px solid rgba(255, 255, 255, 0.88);
+      box-shadow:
+        0 32px 72px -16px rgba(64, 118, 206, 0.24),
+        0 12px 30px -8px rgba(44, 174, 202, 0.14),
+        inset 0 2px 2px rgba(255, 255, 255, 0.96),
+        inset 0 -2px 12px rgba(154, 222, 242, 0.35),
+        inset 14px 0 28px rgba(188, 214, 255, 0.18),
+        inset -14px 0 28px rgba(140, 238, 226, 0.16);
+      transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.35s ease;
+    }
+
+    /* Dynamic specular light highlight that tracks pointer */
+    .specular-sheen {
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.35s ease;
+      background: radial-gradient(
+        420px circle at var(--mx, 50%) var(--my, 20%),
+        rgba(255, 255, 255, 0.42) 0%,
+        rgba(255, 255, 255, 0.08) 38%,
+        transparent 70%
+      );
+      z-index: 1;
+    }
+
+    .liquid-card:hover .specular-sheen {
+      opacity: 1;
+    }
+
+    /* Inner frosted glass pill / panel surfaces */
+    .glass-pill {
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.62) 0%, rgba(237, 245, 255, 0.45) 100%);
+      border: 1.5px solid rgba(255, 255, 255, 0.82);
+      box-shadow:
+        inset 0 1px 2px rgba(255, 255, 255, 0.9),
+        inset 0 -1px 4px rgba(138, 178, 236, 0.14),
+        0 6px 16px rgba(72, 122, 198, 0.08);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+
+    .glass-subcard {
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.64) 0%, rgba(242, 248, 255, 0.42) 100%);
+      border: 1.5px solid rgba(255, 255, 255, 0.86);
+      box-shadow:
+        inset 0 2px 3px rgba(255, 255, 255, 0.92),
+        0 10px 26px -8px rgba(74, 122, 202, 0.12);
+    }
+
+    /* Active Timeframe Pill (Glossy Liquid Blue Gradient) */
+    .active-tab-pill {
+      background: linear-gradient(100deg, #4b55f6 0%, #2472ff 52%, #18a5ff 100%);
+      box-shadow:
+        0 10px 22px -4px rgba(34, 114, 255, 0.52),
+        inset 0 2px 3px rgba(255, 255, 255, 0.58),
+        inset 0 -2px 5px rgba(22, 60, 185, 0.35);
+      transition: transform 0.42s cubic-bezier(0.34, 1.4, 0.64, 1);
+    }
+
+    /* Bottom Primary CTA Liquid Gradient Button */
+    .cta-liquid-btn {
+      position: relative;
+      background: linear-gradient(95deg, #435cff 0%, #1d86ff 42%, #11c6e8 74%, #0ee6be 100%);
+      border: 1.5px solid rgba(255, 255, 255, 0.72);
+      box-shadow:
+        0 16px 34px -8px rgba(28, 134, 255, 0.46),
+        0 8px 20px -6px rgba(14, 224, 190, 0.34),
+        inset 0 2px 3px rgba(255, 255, 255, 0.62),
+        inset 0 -3px 8px rgba(20, 74, 186, 0.25);
+      transition: transform 0.22s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.25s ease, filter 0.25s ease;
+    }
+
+    .cta-liquid-btn::before {
+      content: '';
+      position: absolute;
+      inset: 2px 4px auto 4px;
+      height: 44%;
+      border-radius: 9999px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.38) 0%, rgba(255, 255, 255, 0) 100%);
+      pointer-events: none;
+    }
+
+    .cta-liquid-btn:hover {
+      transform: translateY(-2px) scale(1.012);
+      box-shadow:
+        0 20px 40px -8px rgba(28, 134, 255, 0.55),
+        0 10px 24px -6px rgba(14, 224, 190, 0.42),
+        inset 0 2px 4px rgba(255, 255, 255, 0.72);
+      filter: brightness(1.03);
+    }
+
+    .cta-liquid-btn:active {
+      transform: translateY(0) scale(0.985);
+    }
+
+    /* Floating Glass Speech-Bubble Tooltip */
+    .glass-tooltip {
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.92) 0%, rgba(244, 249, 255, 0.84) 100%);
+      border: 1.5px solid rgba(255, 255, 255, 0.96);
+      box-shadow:
+        0 10px 24px -4px rgba(68, 114, 194, 0.22),
+        inset 0 1px 1px rgba(255, 255, 255, 1);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      transition: left 0.08s linear, top 0.08s linear, transform 0.2s ease;
+    }
+
+    .glass-tooltip::after {
+      content: '';
+      position: absolute;
+      bottom: -6px;
+      left: 50%;
+      width: 11px;
+      height: 11px;
+      background: rgba(247, 251, 255, 0.92);
+      border-right: 1.5px solid rgba(255, 255, 255, 0.95);
+      border-bottom: 1.5px solid rgba(255, 255, 255, 0.95);
+      transform: translateX(-50%) rotate(45deg);
+      border-bottom-right-radius: 3px;
+    }
+
+    /* Subtle pulse for active chart dot */
+    @keyframes dotPulse {
+      0%, 100% { opacity: 0.55; transform: scale(1); }
+      50% { opacity: 0.18; transform: scale(1.75); }
+    }
+
+    .dot-ring-pulse {
+      transform-box: fill-box;
+      transform-origin: center;
+      animation: dotPulse 2.4s ease-in-out infinite;
+    }
+
+    /* Icon badge glass styling */
+    .icon-badge-blue {
+      background: radial-gradient(circle at 30% 25%, #ffffff 0%, #dceaff 58%, #bcd7ff 100%);
+      box-shadow:
+        inset 0 2px 3px rgba(255, 255, 255, 0.95),
+        0 6px 14px rgba(48, 110, 240, 0.16);
+      border: 1.5px solid rgba(255, 255, 255, 0.92);
+    }
+
+    .icon-badge-mint {
+      background: radial-gradient(circle at 30% 25%, #ffffff 0%, #d4fbf1 58%, #b2f4e4 100%);
+      box-shadow:
+        inset 0 2px 3px rgba(255, 255, 255, 0.95),
+        0 6px 14px rgba(14, 200, 156, 0.16);
+      border: 1.5px solid rgba(255, 255, 255, 0.92);
+    }
+
+    /* Smooth details sheet animation */
+    .details-panel {
+      transition: opacity 0.36s cubic-bezier(0.22, 1, 0.36, 1), transform 0.38s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .details-hidden {
+      opacity: 0;
+      transform: translateY(22px) scale(0.98);
+      pointer-events: none;
+    }
+
+    .details-visible {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      pointer-events: auto;
+    }
+
+    /* Custom subtle scrollbar for details view on small screens */
+    .glass-scroll::-webkit-scrollbar {
+      width: 5px;
+    }
+    .glass-scroll::-webkit-scrollbar-thumb {
+      background: rgba(114, 156, 224, 0.35);
+      border-radius: 9999px;
+    }
+  </style>
+</head>
+
+<body class="min-h-screen w-full flex items-center justify-center p-4 sm:p-6 md:p-10 relative selection:bg-blue-500/20 selection:text-blue-900">
+
+  <!-- ========================================================================
+       AMBIENT 3D LIQUID GLASS BACKGROUND ORBS (Parallax Enabled)
+       ======================================================================== -->
+  <div id="orbLayer" class="fixed inset-0 overflow-hidden pointer-events-none select-none z-0" aria-hidden="true">
+    <!-- Top-Left Sculpted Royal-Blue Glass Wave -->
+    <div
+      data-depth="0.025"
+      class="parallax-orb orb-float-1 glass-orb-tl absolute -top-24 -left-20 sm:-top-28 sm:-left-16 w-72 h-72 sm:w-96 sm:h-96 rounded-[46%_54%_58%_42%/44%_48%_52%_56%]"
+    >
+      <!-- Internal curved glass light streak -->
+      <div class="absolute top-6 left-10 w-36 h-16 rounded-full bg-white/40 blur-md -rotate-24"></div>
+    </div>
+
+    <!-- Soft ambient cyan glow behind card center-right -->
+    <div
+      data-depth="0.015"
+      class="parallax-orb absolute top-1/2 right-[8%] -translate-y-1/2 w-80 h-80 rounded-full bg-cyan-300/25 blur-3xl"
+    ></div>
+
+    <!-- Bottom-Left Pale Periwinkle Liquid Glass Lobe -->
+    <div
+      data-depth="0.02"
+      class="parallax-orb orb-float-2 glass-orb-bl absolute -bottom-28 -left-24 w-80 h-80 sm:w-[26rem] sm:h-[26rem] rounded-[54%_46%_42%_58%/52%_58%_42%_48%]"
+    ></div>
+
+    <!-- Bottom-Right Large Translucent Aqua Bubble -->
+    <div
+      data-depth="0.03"
+      class="parallax-orb orb-float-2 glass-orb-br-lg absolute -bottom-24 -right-20 sm:-bottom-20 sm:-right-14 w-80 h-80 sm:w-[27rem] sm:h-[27rem] rounded-full"
+    >
+      <div class="absolute top-8 left-12 w-28 h-12 rounded-full bg-white/55 blur-sm -rotate-18"></div>
+    </div>
+
+    <!-- Bottom-Right Crisp Iridescent Glass Droplet Sphere -->
+    <div
+      data-depth="0.045"
+      class="parallax-orb orb-float-3 glass-orb-droplet absolute bottom-6 right-5 sm:bottom-12 sm:right-12 w-20 h-20 sm:w-28 sm:h-28 rounded-full"
+    >
+      <div class="absolute top-3 left-4 w-6 h-3.5 rounded-full bg-white/85 blur-[1px] -rotate-30"></div>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       MAIN FLOATING LIQUID GLASS ANALYTICS CARD
+       ======================================================================== -->
+  <main class="relative z-10 w-full max-w-[440px] mx-auto">
+    <section
+      id="analyticsCard"
+      class="liquid-card rounded-[42px] p-5 sm:p-7 overflow-hidden"
+      aria-label="Users Analytics Dashboard"
+    >
+      <!-- Dynamic pointer-tracking specular sheen -->
+      <div id="specularSheen" class="specular-sheen"></div>
+
+      <!-- ====================================================================
+           PRIMARY OVERVIEW VIEW
+           ==================================================================== -->
+      <div id="overviewView" class="relative z-10 transition-all duration-300">
+
+        <!-- 1. HEADER ROW -->
+        <header class="flex items-center justify-between gap-3 mb-5">
+          <!-- Left: Users Glass Badge + Tracked Title -->
+          <div class="flex items-center gap-3">
+            <div class="icon-badge-blue w-11 h-11 rounded-full flex items-center justify-center shrink-0">
+              <!-- Dual Users Silhouette Gradient SVG -->
+              <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <defs>
+                  <linearGradient id="usersIconGrad" x1="0" y1="0" x2="24" y2="24" gradientUnits="userSpaceOnUse">
+                    <stop offset="0%" stop-color="#3b5bff" />
+                    <stop offset="100%" stop-color="#1985ff" />
+                  </linearGradient>
+                </defs>
+                <circle cx="9.2" cy="8.2" r="3.4" fill="url(#usersIconGrad)" />
+                <path d="M2.8 18.4C2.8 15.1 5.6 13.1 9.2 13.1C12.8 13.1 15.6 15.1 15.6 18.4C15.6 19.0 15.1 19.5 14.5 19.5H3.9C3.3 19.5 2.8 19.0 2.8 18.4Z" fill="url(#usersIconGrad)" />
+                <circle cx="16.5" cy="9.4" r="2.4" fill="url(#usersIconGrad)" opacity="0.82" />
+                <path d="M16.2 13.4C18.9 13.6 21.2 15.2 21.2 17.9C21.2 18.5 20.8 18.9 20.2 18.9H16.8" stroke="url(#usersIconGrad)" stroke-width="2.1" stroke-linecap="round" opacity="0.82" />
+              </svg>
+            </div>
+            <div class="flex flex-col">
+              <h1 id="cardTitle" class="text-[15px] font-bold tracking-[0.14em] text-[#141d30] uppercase leading-tight">
+                USERS
+              </h1>
+              <span id="liveSubtitle" class="text-[11px] font-medium text-slate-500/90 hidden items-center gap-1.5 mt-0.5">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                Live telemetry
+              </span>
+            </div>
+          </div>
+
+          <!-- Right: Interactive Analytics Metric Switcher Pill -->
+          <div class="relative">
+            <button
+              id="analyticsToggleBtn"
+              type="button"
+              class="glass-pill group flex items-center gap-2 px-3.5 py-2 min-h-[40px] rounded-full text-[13px] font-medium text-[#526583] hover:text-[#1b2944] transition-all active:scale-95 cursor-pointer"
+              aria-haspopup="true"
+              aria-expanded="false"
+              title="Switch analytics metric"
+            >
+              <!-- Mini Bar Chart Icon -->
+              <svg class="w-4 h-4 text-[#5d87b8] group-hover:text-blue-600 transition-colors" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                <rect x="3" y="10.5" width="3" height="6.5" rx="1.2" fill="currentColor" opacity="0.65" />
+                <rect x="8.5" y="6.5" width="3" height="10.5" rx="1.2" fill="currentColor" opacity="0.85" />
+                <rect x="14" y="3" width="3" height="14" rx="1.2" fill="currentColor" />
+              </svg>
+              <span id="analyticsPillLabel">Analytics</span>
+            </button>
+
+            <!-- Glass Popover Menu for Metric Switching -->
+            <div
+              id="metricMenu"
+              class="hidden absolute right-0 mt-2 w-44 rounded-2xl p-1.5 z-30 glass-pill shadow-xl"
+              role="menu"
+            >
+              <button data-metric="users" type="button" class="metric-option w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-[13px] font-semibold text-[#141d30] bg-white/70 transition-colors cursor-pointer" role="menuitem">
+                <span>Users</span>
+                <span class="w-2 h-2 rounded-full bg-blue-500"></span>
+              </button>
+              <button data-metric="sessions" type="button" class="metric-option w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-[13px] font-medium text-[#526583] hover:bg-white/60 transition-colors cursor-pointer" role="menuitem">
+                <span>Sessions</span>
+                <span class="w-2 h-2 rounded-full bg-transparent"></span>
+              </button>
+              <button data-metric="revenue" type="button" class="metric-option w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-[13px] font-medium text-[#526583] hover:bg-white/60 transition-colors cursor-pointer" role="menuitem">
+                <span>Revenue</span>
+                <span class="w-2 h-2 rounded-full bg-transparent"></span>
+              </button>
+            </div>
+          </div>
+        </header>
+
+        <!-- 2. SEGMENTED TIMEFRAME SELECTOR (7d | 12d | 30d) -->
+        <div
+          class="glass-pill relative grid grid-cols-3 p-1.5 rounded-full mb-6 select-none"
+          role="tablist"
+          aria-label="Select time range"
+        >
+          <!-- Animated Sliding Liquid Blue Pill -->
+          <div
+            id="activeTabPill"
+            class="active-tab-pill absolute top-1.5 bottom-1.5 left-1.5 w-[calc((100%-12px)/3)] rounded-full pointer-events-none"
+            style="transform: translateX(100%);"
+          ></div>
+
+          <button
+            type="button"
+            role="tab"
+            data-range="7d"
+            data-index="0"
+            aria-selected="false"
+            class="range-tab relative z-10 py-2.5 min-h-[42px] text-[15px] font-semibold rounded-full text-[#536480] hover:text-[#1c2a44] transition-colors cursor-pointer"
+          >
+            7d
+          </button>
+          <button
+            type="button"
+            role="tab"
+            data-range="12d"
+            data-index="1"
+            aria-selected="true"
+            class="range-tab relative z-10 py-2.5 min-h-[42px] text-[15px] font-semibold rounded-full text-white transition-colors cursor-pointer"
+          >
+            12d
+          </button>
+          <button
+            type="button"
+            role="tab"
+            data-range="30d"
+            data-index="2"
+            aria-selected="false"
+            class="range-tab relative z-10 py-2.5 min-h-[42px] text-[15px] font-semibold rounded-full text-[#536480] hover:text-[#1c2a44] transition-colors cursor-pointer"
+          >
+            30d
+          </button>
+        </div>
+
+        <!-- 3. HERO METRIC & GROWTH DELTA -->
+        <div class="flex items-start justify-between mb-1 px-1">
+          <div>
+            <div
+              id="heroNumber"
+              class="text-[46px] sm:text-[50px] font-extrabold tracking-[-0.03em] leading-[1.04] text-[#11192a] tabular-nums"
+            >
+              1,240
+            </div>
+            <div class="flex items-center gap-1.5 mt-2">
+              <span id="deltaBadge" class="inline-flex items-center gap-1 text-[17px] font-bold text-[#0ec89c] tabular-nums">
+                <svg id="deltaArrow" class="w-4 h-4 stroke-[2.8] transition-transform duration-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M12 19V5" />
+                  <path d="M5 12l7-7 7 7" />
+                </svg>
+                <span id="heroDelta">12.5%</span>
+              </span>
+              <span id="scrubHint" class="text-[11px] font-medium text-slate-400/90 ml-1 opacity-0 transition-opacity duration-300">
+                Scrubbing chart
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4. INTERACTIVE LIQUID SPLINE AREA CHART -->
+        <div class="relative mt-2 mb-5">
+          <!-- Interactive Chart Container (Mouse + Touch Scrubbing) -->
+          <div
+            id="chartStage"
+            class="relative w-full h-[170px] sm:h-[182px] cursor-crosshair touch-none select-none"
+            role="img"
+            aria-label="Interactive area trend chart. Move pointer or drag to inspect daily values."
+          >
+            <!-- Floating Frosted Glass Speech-Bubble Tooltip -->
+            <div
+              id="chartTooltip"
+              class="glass-tooltip absolute z-20 px-3.5 py-1.5 rounded-2xl pointer-events-none whitespace-nowrap"
+              style="left: 82%; top: 10px; transform: translateX(-50%);"
+            >
+              <div class="flex items-center gap-1.5">
+                <span id="tooltipDate" class="text-[13px] font-semibold text-[#233252]">Aug 12</span>
+                <span id="tooltipValue" class="hidden text-[12px] font-bold text-[#1488e8] pl-1 border-l border-slate-300/70">1,240</span>
+              </div>
+            </div>
+
+            <!-- Responsive High-DPI Vector Spline Chart -->
+            <svg
+              id="splineSvg"
+              class="w-full h-full overflow-visible"
+              viewBox="0 0 380 155"
+              preserveAspectRatio="none"
+            >
+              <defs>
+                <!-- Horizontal Stroke Gradient (Mint -> Cyan -> Royal Blue -> Turquoise) -->
+                <linearGradient id="lineGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stop-color="#13dab5" />
+                  <stop offset="32%" stop-color="#17d0d6" />
+                  <stop offset="66%" stop-color="#2970ff" />
+                  <stop offset="86%" stop-color="#15a8f2" />
+                  <stop offset="100%" stop-color="#0ed8b0" />
+                </linearGradient>
+
+                <!-- Horizontal Area Tint Gradient -->
+                <linearGradient id="areaHorizGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stop-color="#14e0bd" />
+                  <stop offset="35%" stop-color="#22d3ee" />
+                  <stop offset="68%" stop-color="#3b82f6" />
+                  <stop offset="100%" stop-color="#10dfb8" />
+                </linearGradient>
+
+                <!-- Vertical Fade Mask so Area Dissolves Cleanly into Frosted Glass -->
+                <linearGradient id="areaFadeMaskGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                  <stop offset="0%" stop-color="white" stop-opacity="0.54" />
+                  <stop offset="58%" stop-color="white" stop-opacity="0.22" />
+                  <stop offset="100%" stop-color="white" stop-opacity="0" />
+                </linearGradient>
+
+                <mask id="areaFadeMask">
+                  <rect x="0" y="0" width="380" height="155" fill="url(#areaFadeMaskGrad)" />
+                </mask>
+
+                <!-- Soft Luminous Glow Under the Spline -->
+                <filter id="lineGlow" x="-15%" y="-25%" width="130%" height="160%">
+                  <feGaussianBlur stdDeviation="4.5" result="blur" />
+                  <feMerge>
+                    <feMergeNode in="blur" />
+                    <feMergeNode in="SourceGraphic" />
+                  </feMerge>
+                </filter>
+
+                <!-- Active Node Soft Drop Shadow -->
+                <filter id="dotShadow" x="-60%" y="-60%" width="220%" height="220%">
+                  <feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#0ec89c" flood-opacity="0.55" />
+                </filter>
+              </defs>
+
+              <!-- Vertical Interactive Scrubbing Guide Line -->
+              <line
+                id="scrubLine"
+                x1="364"
+                y1="56"
+                x2="364"
+                y2="148"
+                stroke="rgba(34, 114, 255, 0.22)"
+                stroke-width="1.5"
+                stroke-dasharray="4 4"
+                opacity="0"
+              />
+
+              <!-- Translucent Masked Gradient Area Fill -->
+              <path id="areaPath" d="" fill="url(#areaHorizGrad)" mask="url(#areaFadeMask)" />
+
+              <!-- Soft Ambient Glow Stroke -->
+              <path
+                id="glowPath"
+                d=""
+                fill="none"
+                stroke="url(#lineGrad)"
+                stroke-width="6"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                opacity="0.28"
+                filter="url(#lineGlow)"
+              />
+
+              <!-- Crisp Primary Liquid Curve -->
+              <path
+                id="linePath"
+                d=""
+                fill="none"
+                stroke="url(#lineGrad)"
+                stroke-width="3.2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+
+              <!-- Glowing Active Data Point Marker -->
+              <g id="activeMarker" transform="translate(364, 54)" filter="url(#dotShadow)">
+                <circle class="dot-ring-pulse" r="10.5" fill="#13dab5" />
+                <circle r="7.5" fill="#ffffff" />
+                <circle id="markerCore" r="4.6" fill="#0fd2ad" />
+              </g>
+            </svg>
+          </div>
+
+          <!-- X-Axis Date Labels -->
+          <div class="flex items-center justify-between px-1 mt-1 text-[11.5px] font-semibold tracking-[0.06em] text-[#5f7290] uppercase select-none">
+            <span id="axisStart">AUG 1</span>
+            <span id="axisMid">AUG 6</span>
+            <span id="axisEnd">AUG 12</span>
+          </div>
+        </div>
+
+        <!-- 5. SUB-METRICS FROSTED GLASS PANEL -->
+        <div class="glass-subcard rounded-[24px] p-3.5 sm:p-4 mb-5 space-y-2.5">
+          <!-- Metric Row 1: New Users -->
+          <div class="flex items-center justify-between gap-3 px-1.5 py-1.5 rounded-2xl hover:bg-white/45 transition-colors">
+            <div class="flex items-center gap-3.5">
+              <div class="icon-badge-blue w-10 h-10 rounded-full flex items-center justify-center shrink-0">
+                <svg class="w-4.5 h-4.5" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <defs>
+                    <linearGradient id="singleUserGrad" x1="4" y1="3" x2="20" y2="21" gradientUnits="userSpaceOnUse">
+                      <stop offset="0%" stop-color="#3b68ff" />
+                      <stop offset="100%" stop-color="#178fff" />
+                    </linearGradient>
+                  </defs>
+                  <circle cx="12" cy="8.2" r="3.8" fill="url(#singleUserGrad)" />
+                  <path d="M5 19C5 15.6 8.1 13.5 12 13.5C15.9 13.5 19 15.6 19 19C19 19.6 18.5 20 17.9 20H6.1C5.5 20 5 19.6 5 19Z" fill="url(#singleUserGrad)" />
+                </svg>
+              </div>
+              <span id="subLabel1" class="text-[15.5px] font-medium text-[#1b2740]">New users</span>
+            </div>
+            <span id="subValue1" class="text-[18px] font-bold text-[#141d30] tabular-nums">980</span>
+          </div>
+
+          <!-- Subtle Luminous Hairline Divider -->
+          <div class="h-px bg-gradient-to-r from-transparent via-white/90 to-transparent mx-2"></div>
+
+          <!-- Metric Row 2: Bounce Rate -->
+          <div class="flex items-center justify-between gap-3 px-1.5 py-1.5 rounded-2xl hover:bg-white/45 transition-colors">
+            <div class="flex items-center gap-3.5">
+              <div class="icon-badge-mint w-10 h-10 rounded-full flex items-center justify-center shrink-0">
+                <svg class="w-4.5 h-4.5 text-[#0dc49d]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <polyline points="22 7 13.5 15.5 8.5 10.5 2 17" />
+                  <polyline points="16 7 22 7 22 13" />
+                </svg>
+              </div>
+              <span id="subLabel2" class="text-[15.5px] font-medium text-[#1b2740]">Bounce rate</span>
+            </div>
+            <span id="subValue2" class="text-[18px] font-bold text-[#141d30] tabular-nums">43.5%</span>
+          </div>
+        </div>
+
+        <!-- 6. PRIMARY LIQUID GRADIENT CTA BUTTON -->
+        <button
+          id="viewDetailsBtn"
+          type="button"
+          class="cta-liquid-btn w-full min-h-[58px] rounded-full px-6 py-3.5 flex items-center justify-center gap-3 text-white font-semibold text-[16px] tracking-[0.01em] cursor-pointer group"
+        >
+          <!-- Left Frosted Circular Arrow Badge -->
+          <span class="w-7 h-7 rounded-full bg-white/85 flex items-center justify-center shadow-sm transition-transform duration-300 group-hover:translate-x-0.5">
+            <svg class="w-3.5 h-3.5 text-[#246eff]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M5 12h14" />
+              <path d="M13 6l6 6-6 6" />
+            </svg>
+          </span>
+
+          <span>View details</span>
+
+          <!-- Right Sleek Arrow -->
+          <svg class="w-4.5 h-4.5 text-white/95 transition-transform duration-300 group-hover:translate-x-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M5 12h14" />
+            <path d="M13 6l6 6-6 6" />
+          </svg>
+        </button>
+      </div>
+
+      <!-- ====================================================================
+           EXPANDED LIQUID GLASS DETAILS DRAWER (Opens on "View details")
+           ==================================================================== -->
+      <div
+        id="detailsView"
+        class="details-panel details-hidden absolute inset-0 z-20 p-5 sm:p-7 flex flex-col bg-gradient-to-b from-white/85 via-[#eef6ff]/88 to-[#e7f8fa]/92 backdrop-blur-2xl"
+        aria-hidden="true"
+      >
+        <!-- Details Header -->
+        <div class="flex items-center justify-between gap-2 mb-5">
+          <button
+            id="backToOverviewBtn"
+            type="button"
+            class="glass-pill inline-flex items-center gap-2 px-3.5 py-2 min-h-[40px] rounded-full text-[13px] font-semibold text-[#1e2d49] hover:bg-white/80 transition-all active:scale-95 cursor-pointer"
+          >
+            <svg class="w-4 h-4 text-[#236dff]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M19 12H5" />
+              <path d="M11 18l-6-6 6-6" />
+            </svg>
+            Back
+          </button>
+
+          <span id="detailsRangeBadge" class="glass-pill px-3 py-1.5 rounded-full text-[12px] font-semibold text-[#236dff]">
+            USERS · 12d
+          </span>
+        </div>
+
+        <!-- Scrollable Analytics Breakdown -->
+        <div class="glass-scroll flex-1 overflow-y-auto space-y-4 pr-0.5">
+          <!-- Summary Strip -->
+          <div class="grid grid-cols-2 gap-3">
+            <div class="glass-subcard rounded-2xl p-3.5">
+              <div class="text-[11.5px] font-semibold uppercase tracking-wider text-[#627696]">Avg. Session</div>
+              <div id="detailAvgSession" class="text-[22px] font-extrabold text-[#141d30] mt-1 tabular-nums">4m 28s</div>
+              <div class="text-[11.5px] font-semibold text-[#0ec89c] mt-0.5">+18.4% vs prev</div>
+            </div>
+            <div class="glass-subcard rounded-2xl p-3.5">
+              <div class="text-[11.5px] font-semibold uppercase tracking-wider text-[#627696]">Retention</div>
+              <div id="detailRetention" class="text-[22px] font-extrabold text-[#141d30] mt-1 tabular-nums">68.2%</div>
+              <div class="text-[11.5px] font-semibold text-[#236dff] mt-0.5">Top 10% tier</div>
+            </div>
+          </div>
+
+          <!-- Acquisition Channels Card -->
+          <div class="glass-subcard rounded-[24px] p-4 space-y-3.5">
+            <div class="flex items-center justify-between">
+              <h2 class="text-[13.5px] font-bold tracking-wide text-[#1a2742] uppercase">Acquisition Channels</h2>
+              <span class="text-[11.5px] font-medium text-[#5f7290]">Share</span>
+            </div>
+
+            <div id="channelsList" class="space-y-3">
+              <!-- Populated dynamically via JS -->
+            </div>
+          </div>
+
+          <!-- Peak Insights Card -->
+          <div class="glass-subcard rounded-[22px] p-4">
+            <div class="flex items-center justify-between mb-2">
+              <h2 class="text-[13px] font-bold tracking-wide text-[#1a2742] uppercase">Peak Window</h2>
+              <span class="inline-flex items-center gap-1.5 text-[11.5px] font-semibold text-[#0ec89c]">
+                <span class="w-2 h-2 rounded-full bg-[#0ec89c] animate-pulse"></span>
+                Healthy
+              </span>
+            </div>
+            <p id="detailInsightText" class="text-[13px] leading-relaxed text-[#4f6280]">
+              Traffic surged sharply into <strong class="text-[#141d30]">Aug 12</strong>, driven by returning organic visitors and a 12.5% lift in activation rate.
+            </p>
+          </div>
+        </div>
+
+        <!-- Copy Report Summary Action -->
+        <div class="pt-4 mt-2">
+          <button
+            id="copySummaryBtn"
+            type="button"
+            class="cta-liquid-btn w-full min-h-[52px] rounded-full px-5 py-3 flex items-center justify-center gap-2.5 text-white font-semibold text-[15px] cursor-pointer"
+          >
+            <svg class="w-4.5 h-4.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="9" y="9" width="13" height="13" rx="3" />
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+            </svg>
+            <span id="copyBtnText">Copy analytics snapshot</span>
+          </button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Subtle Floating Toast Feedback (No alert() used) -->
+  <div
+    id="toastMessage"
+    class="fixed bottom-5 left-1/2 -translate-x-1/2 translate-y-6 opacity-0 pointer-events-none z-50 glass-pill px-4 py-2.5 rounded-full text-[13px] font-semibold text-[#142038] shadow-lg transition-all duration-300 flex items-center gap-2"
+    role="status"
+    aria-live="polite"
+  >
+    <span class="w-2 h-2 rounded-full bg-[#0ec89c]"></span>
+    <span id="toastText">Copied to clipboard</span>
+  </div>
+
+  <!-- ========================================================================
+       INTERACTIVE CHART ENGINE, MORPHING ANIMATIONS & LIQUID GLASS PHYSICS
+       ======================================================================== -->
+  <script>
+    (function () {
+      'use strict';
+
+      /* ----------------------------------------------------------------------
+         1. RICH STRUCTURED DATASETS (Metrics x Timeframes)
+         All point arrays contain 21 normalized values (0.08 to 0.96) so curves
+         morph seamlessly like liquid without polygon jumps.
+         ---------------------------------------------------------------------- */
+      const ANALYTICS_DATA = {
+        users: {
+          title: 'USERS',
+          pillLabel: 'Analytics',
+          subLabel1: 'New users',
+          subLabel2: 'Bounce rate',
+          formatHero: (v) => Math.round(v).toLocaleString('en-US'),
+          formatTooltip: (v) => Math.round(v).toLocaleString('en-US') + ' users',
+          ranges: {
+            '7d': {
+              hero: 748,
+              delta: 8.4,
+              sub1: 590,
+              sub1IsPercent: false,
+              sub2: 41.2,
+              sub2IsPercent: true,
+              axis: ['AUG 6', 'AUG 9', 'AUG 12'],
+              dates: [
+                'Aug 6', 'Aug 6', 'Aug 7', 'Aug 7', 'Aug 7',
+                'Aug 8', 'Aug 8', 'Aug 8', 'Aug 9', 'Aug 9',
+                'Aug 9', 'Aug 10', 'Aug 10', 'Aug 10', 'Aug 11',
+                'Aug 11', 'Aug 11', 'Aug 12', 'Aug 12', 'Aug 12', 'Aug 12'
+              ],
+              points: [
+                0.24, 0.36, 0.30, 0.52, 0.45,
+                0.58, 0.50, 0.41, 0.62, 0.54,
+                0.44, 0.68, 0.60, 0.72, 0.55,
+                0.66, 0.78, 0.69, 0.80, 0.86, 0.91
+              ],
+              avgSession: '4m 12s',
+              retention: '64.9%',
+              channels: [
+                { name: 'Organic Search', pct: 44, grad: 'from-[#3b6bff] to-[#13b7f4]' },
+                { name: 'Direct & App', pct: 29, grad: 'from-[#169aff] to-[#0fd8b5]' },
+                { name: 'Social & Creators', pct: 18, grad: 'from-[#565eff] to-[#2789ff]' },
+                { name: 'Referrals', pct: 9, grad: 'from-[#14c9d6] to-[#12e4b8]' }
+              ],
+              insight: 'Steady 7-day climb with peak concurrency on Aug 12 morning and lower bounce rates across mobile devices.'
+            },
+            '12d': {
+              hero: 1240,
+              delta: 12.5,
+              sub1: 980,
+              sub1IsPercent: false,
+              sub2: 43.5,
+              sub2IsPercent: true,
+              axis: ['AUG 1', 'AUG 6', 'AUG 12'],
+              dates: [
+                'Aug 1', 'Aug 1', 'Aug 2', 'Aug 2', 'Aug 3',
+                'Aug 3', 'Aug 4', 'Aug 4', 'Aug 5', 'Aug 5',
+                'Aug 6', 'Aug 7', 'Aug 7', 'Aug 8', 'Aug 9',
+                'Aug 9', 'Aug 10', 'Aug 10', 'Aug 11', 'Aug 11', 'Aug 12'
+              ],
+              // Sculpted curve matching the organic multi-peak silhouette of the reference UI
+              points: [
+                0.15, 0.24, 0.56, 0.46, 0.72,
+                0.56, 0.71, 0.49, 0.52, 0.65,
+                0.18, 0.23, 0.14, 0.42, 0.56,
+                0.48, 0.74, 0.60, 0.84, 0.61, 0.94
+              ],
+              avgSession: '4m 28s',
+              retention: '68.2%',
+              channels: [
+                { name: 'Organic Search', pct: 48, grad: 'from-[#3b6bff] to-[#13b7f4]' },
+                { name: 'Direct & App', pct: 26, grad: 'from-[#169aff] to-[#0fd8b5]' },
+                { name: 'Social & Creators', pct: 17, grad: 'from-[#565eff] to-[#2789ff]' },
+                { name: 'Referrals', pct: 9, grad: 'from-[#14c9d6] to-[#12e4b8]' }
+              ],
+              insight: 'Traffic rebounded sharply after Aug 6 and peaked on Aug 12, delivering 980 new users and a +12.5% velocity gain.'
+            },
+            '30d': {
+              hero: 3860,
+              delta: 24.8,
+              sub1: 2940,
+              sub1IsPercent: false,
+              sub2: 39.8,
+              sub2IsPercent: true,
+              axis: ['JUL 14', 'JUL 29', 'AUG 12'],
+              dates: [
+                'Jul 14', 'Jul 16', 'Jul 17', 'Jul 19', 'Jul 20',
+                'Jul 22', 'Jul 23', 'Jul 25', 'Jul 26', 'Jul 28',
+                'Jul 29', 'Jul 31', 'Aug 1', 'Aug 3', 'Aug 4',
+                'Aug 6', 'Aug 7', 'Aug 9', 'Aug 10', 'Aug 11', 'Aug 12'
+              ],
+              points: [
+                0.18, 0.28, 0.25, 0.39, 0.48,
+                0.42, 0.56, 0.63, 0.51, 0.45,
+                0.60, 0.68, 0.58, 0.74, 0.69,
+                0.81, 0.72, 0.86, 0.79, 0.89, 0.96
+              ],
+              avgSession: '5m 04s',
+              retention: '72.6%',
+              channels: [
+                { name: 'Organic Search', pct: 52, grad: 'from-[#3b6bff] to-[#13b7f4]' },
+                { name: 'Direct & App', pct: 24, grad: 'from-[#169aff] to-[#0fd8b5]' },
+                { name: 'Social & Creators', pct: 15, grad: 'from-[#565eff] to-[#2789ff]' },
+                { name: 'Referrals', pct: 9, grad: 'from-[#14c9d6] to-[#12e4b8]' }
+              ],
+              insight: 'Month-over-month compounding growth pushed monthly active users to 3,860 while reducing bounce rate to 39.8%.'
+            }
+          }
+        },
+        sessions: {
+          title: 'SESSIONS',
+          pillLabel: 'Sessions',
+          subLabel1: 'Avg. pages',
+          subLabel2: 'Engagement',
+          formatHero: (v) => Math.round(v).toLocaleString('en-US'),
+          formatTooltip: (v) => Math.round(v).toLocaleString('en-US') + ' visits',
+          ranges: {
+            '7d': {
+              hero: 2180,
+              delta: 11.2,
+              sub1: 4.8,
+              sub1Decimal: true,
+              sub2: 74.6,
+              sub2IsPercent: true,
+              axis: ['AUG 6', 'AUG 9', 'AUG 12'],
+              dates: [
+                'Aug 6', 'Aug 6', 'Aug 7', 'Aug 7', 'Aug 7',
+                'Aug 8', 'Aug 8', 'Aug 8', 'Aug 9', 'Aug 9',
+                'Aug 9', 'Aug 10', 'Aug 10', 'Aug 10', 'Aug 11',
+                'Aug 11', 'Aug 11', 'Aug 12', 'Aug 12', 'Aug 12', 'Aug 12'
+              ],
+              points: [
+                0.28, 0.42, 0.50, 0.44, 0.60,
+                0.55, 0.68, 0.58, 0.49, 0.65,
+                0.71, 0.62, 0.77, 0.70, 0.64,
+                0.80, 0.75, 0.84, 0.78, 0.88, 0.92
+              ],
+              avgSession: '4m 46s',
+              retention: '71.0%',
+              channels: [
+                { name: 'Organic Search', pct: 46, grad: 'from-[#3b6bff] to-[#13b7f4]' },
+                { name: 'Direct & App', pct: 31, grad: 'from-[#169aff] to-[#0fd8b5]' },
+                { name: 'Social & Creators', pct: 15, grad: 'from-[#565eff] to-[#2789ff]' },
+                { name: 'Referrals', pct: 8, grad: 'from-[#14c9d6] to-[#12e4b8]' }
+              ],
+              insight: 'Session depth climbed steadily over the last 7 days with 74.6% of sessions engaging beyond two views.'
+            },
+            '12d': {
+              hero: 3640,
+              delta: 15.8,
+              sub1: 5.2,
+              sub1Decimal: true,
+              sub2: 78.4,
+              sub2IsPercent: true,
+              axis: ['AUG 1', 'AUG 6', 'AUG 12'],
+              dates: [
+                'Aug 1', 'Aug 1', 'Aug 2', 'Aug 2', 'Aug 3',
+                'Aug 3', 'Aug 4', 'Aug 4', 'Aug 5', 'Aug 5',
+                'Aug 6', 'Aug 7', 'Aug 7', 'Aug 8', 'Aug 9',
+                'Aug 9', 'Aug 10', 'Aug 10', 'Aug 11', 'Aug 11', 'Aug 12'
+              ],
+              points: [
+                0.22, 0.35, 0.48, 0.39, 0.62,
+                0.53, 0.66, 0.44, 0.36, 0.52,
+                0.31, 0.45, 0.59, 0.51, 0.70,
+                0.63, 0.79, 0.71, 0.86, 0.76, 0.95
+              ],
+              avgSession: '5m 12s',
+              retention: '74.3%',
+              channels: [
+                { name: 'Organic Search', pct: 49, grad: 'from-[#3b6bff] to-[#13b7f4]' },
+                { name: 'Direct & App', pct: 28, grad: 'from-[#169aff] to-[#0fd8b5]' },
+                { name: 'Social & Creators', pct: 14, grad: 'from-[#565eff] to-[#2789ff]' },
+                { name: 'Referrals', pct: 9, grad: 'from-[#14c9d6] to-[#12e4b8]' }
+              ],
+              insight: 'Returning users averaged 5.2 pages per session across the 12-day window, driving a +15.8% jump in activity.'
+            },
+            '30d': {
+              hero: 11420,
+              delta: 29.4,
+              sub1: 5.6,
+              sub1Decimal: true,
+              sub2: 81.2,
+              sub2IsPercent: true,
+              axis: ['JUL 14', 'JUL 29', 'AUG 12'],
+              dates: [
+                'Jul 14', 'Jul 16', 'Jul 17', 'Jul 19', 'Jul 20',
+                'Jul 22', 'Jul 23', 'Jul 25', 'Jul 26', 'Jul 28',
+                'Jul 29', 'Jul 31', 'Aug 1', 'Aug 3', 'Aug 4',
+                'Aug 6', 'Aug 7', 'Aug 9', 'Aug 10', 'Aug 11', 'Aug 12'
+              ],
+              points: [
+                0.20, 0.32, 0.38, 0.34, 0.49,
+                0.56, 0.50, 0.64, 0.58, 0.67,
+                0.61, 0.73, 0.68, 0.78, 0.72,
+                0.83, 0.79, 0.88, 0.84, 0.91, 0.96
+              ],
+              avgSession: '5m 38s',
+              retention: '76.9%',
+              channels: [
+                { name: 'Organic Search', pct: 53, grad: 'from-[#3b6bff] to-[#13b7f4]' },
+                { name: 'Direct & App', pct: 25, grad: 'from-[#169aff] to-[#0fd8b5]' },
+                { name: 'Social & Creators', pct: 13, grad: 'from-[#565eff] to-[#2789ff]' },
+                { name: 'Referrals', pct: 9, grad: 'from-[#14c9d6] to-[#12e4b8]' }
+              ],
+              insight: 'Monthly session volume surpassed 11.4K with sustained desktop and mobile engagement above 81%.'
+            }
+          }
+        },
+        revenue: {
+          title: 'REVENUE',
+          pillLabel: 'Revenue',
+          subLabel1: 'New MRR',
+          subLabel2: 'Conversion',
+          formatHero: (v) => '$' + Math.round(v).toLocaleString('en-US'),
+          formatTooltip: (v) => '$' + Math.round(v).toLocaleString('en-US'),
+          ranges: {
+            '7d': {
+              hero: 8420,
+              delta: 14.2,
+              sub1: 2150,
+              sub1Currency: true,
+              sub2: 5.8,
+              sub2IsPercent: true,
+              axis: ['AUG 6', 'AUG 9', 'AUG 12'],
+              dates: [
+                'Aug 6', 'Aug 6', 'Aug 7', 'Aug 7', 'Aug 7',
+                'Aug 8', 'Aug 8', 'Aug 8', 'Aug 9', 'Aug 9',
+                'Aug 9', 'Aug 10', 'Aug 10', 'Aug 10', 'Aug 11',
+                'Aug 11', 'Aug 11', 'Aug 12', 'Aug 12', 'Aug 12', 'Aug 12'
+              ],
+              points: [
+                0.30, 0.38, 0.44, 0.40, 0.54,
+                0.61, 0.52, 0.66, 0.62, 0.70,
+                0.64, 0.74, 0.78, 0.71, 0.80,
+                0.84, 0.76, 0.88, 0.85, 0.90, 0.94
+              ],
+              avgSession: '6m 05s',
+              retention: '94.2%',
+              channels: [
+                { name: 'Pro Subscriptions', pct: 58, grad: 'from-[#3b6bff] to-[#13b7f4]' },
+                { name: 'Team Plans', pct: 24, grad: 'from-[#169aff] to-[#0fd8b5]' },
+                { name: 'Add-on Credits', pct: 12, grad: 'from-[#565eff] to-[#2789ff]' },
+                { name: 'Enterprise', pct: 6, grad: 'from-[#14c9d6] to-[#12e4b8]' }
+              ],
+              insight: 'Checkout conversion improved to 5.8%, adding $2,150 in net-new MRR over the past 7 days.'
+            },
+            '12d': {
+              hero: 14980,
+              delta: 19.6,
+              sub1: 4280,
+              sub1Currency: true,
+              sub2: 6.4,
+              sub2IsPercent: true,
+              axis: ['AUG 1', 'AUG 6', 'AUG 12'],
+              dates: [
+                'Aug 1', 'Aug 1', 'Aug 2', 'Aug 2', 'Aug 3',
+                'Aug 3', 'Aug 4', 'Aug 4', 'Aug 5', 'Aug 5',
+                'Aug 6', 'Aug 7', 'Aug 7', 'Aug 8', 'Aug 9',
+                'Aug 9', 'Aug 10', 'Aug 10', 'Aug 11', 'Aug 11', 'Aug 12'
+              ],
+              points: [
+                0.20, 0.34, 0.52, 0.45, 0.60,
+                0.50, 0.64, 0.58, 0.42, 0.55,
+                0.38, 0.50, 0.62, 0.58, 0.72,
+                0.68, 0.81, 0.75, 0.87, 0.80, 0.96
+              ],
+              avgSession: '6m 22s',
+              retention: '95.1%',
+              channels: [
+                { name: 'Pro Subscriptions', pct: 55, grad: 'from-[#3b6bff] to-[#13b7f4]' },
+                { name: 'Team Plans', pct: 27, grad: 'from-[#169aff] to-[#0fd8b5]' },
+                { name: 'Add-on Credits', pct: 11, grad: 'from-[#565eff] to-[#2789ff]' },
+                { name: 'Enterprise', pct: 7, grad: 'from-[#14c9d6] to-[#12e4b8]' }
+              ],
+              insight: 'Strong upgrade momentum on Aug 10–12 drove $14,980 total revenue with a 6.4% paid conversion rate.'
+            },
+            '30d': {
+              hero: 42650,
+              delta: 31.2,
+              sub1: 11900,
+              sub1Currency: true,
+              sub2: 6.9,
+              sub2IsPercent: true,
+              axis: ['JUL 14', 'JUL 29', 'AUG 12'],
+              dates: [
+                'Jul 14', 'Jul 16', 'Jul 17', 'Jul 19', 'Jul 20',
+                'Jul 22', 'Jul 23', 'Jul 25', 'Jul 26', 'Jul 28',
+                'Jul 29', 'Jul 31', 'Aug 1', 'Aug 3', 'Aug 4',
+                'Aug 6', 'Aug 7', 'Aug 9', 'Aug 10', 'Aug 11', 'Aug 12'
+              ],
+              points: [
+                0.16, 0.25, 0.31, 0.36, 0.42,
+                0.48, 0.44, 0.56, 0.61, 0.58,
+                0.66, 0.70, 0.65, 0.76, 0.79,
+                0.82, 0.77, 0.86, 0.89, 0.92, 0.97
+              ],
+              avgSession: '6m 40s',
+              retention: '96.4%',
+              channels: [
+                { name: 'Pro Subscriptions', pct: 54, grad: 'from-[#3b6bff] to-[#13b7f4]' },
+                { name: 'Team Plans', pct: 29, grad: 'from-[#169aff] to-[#0fd8b5]' },
+                { name: 'Add-on Credits', pct: 10, grad: 'from-[#565eff] to-[#2789ff]' },
+                { name: 'Enterprise', pct: 7, grad: 'from-[#14c9d6] to-[#12e4b8]' }
+              ],
+              insight: 'Record 30-day expansion revenue with 96.4% net retention and accelerating team-tier adoption.'
+            }
+          }
+        }
+      };
+
+      /* ----------------------------------------------------------------------
+         2. APPLICATION STATE & DOM REFERENCES
+         ---------------------------------------------------------------------- */
+      const state = {
+        metric: 'users',
+        range: '12d',
+        currentPoints: [...ANALYTICS_DATA.users.ranges['12d'].points],
+        isScrubbing: false,
+        scrubIndex: 20, // Default to rightmost peak point ("Aug 12")
+        morphRaf: null,
+        numberRaf: null,
+        toastTimer: null,
+      };
+
+      const CHART_W = 380;
+      const CHART_H = 155;
+      const PAD_LEFT = 8;
+      const PAD_RIGHT = 16;
+      const PAD_TOP = 54; // Leaves luminous breathing room for the floating glass tooltip
+      const PAD_BOTTOM = 10;
+
+      const els = {
+        card: document.getElementById('analyticsCard'),
+        sheen: document.getElementById('specularSheen'),
+        cardTitle: document.getElementById('cardTitle'),
+        analyticsToggleBtn: document.getElementById('analyticsToggleBtn'),
+        analyticsPillLabel: document.getElementById('analyticsPillLabel'),
+        metricMenu: document.getElementById('metricMenu'),
+        metricOptions: document.querySelectorAll('.metric-option'),
+        activeTabPill: document.getElementById('activeTabPill'),
+        rangeTabs: document.querySelectorAll('.range-tab'),
+        heroNumber: document.getElementById('heroNumber'),
+        heroDelta: document.getElementById('heroDelta'),
+        scrubHint: document.getElementById('scrubHint'),
+        chartStage: document.getElementById('chartStage'),
+        chartTooltip: document.getElementById('chartTooltip'),
+        tooltipDate: document.getElementById('tooltipDate'),
+        tooltipValue: document.getElementById('tooltipValue'),
+        areaPath: document.getElementById('areaPath'),
+        glowPath: document.getElementById('glowPath'),
+        linePath: document.getElementById('linePath'),
+        activeMarker: document.getElementById('activeMarker'),
+        scrubLine: document.getElementById('scrubLine'),
+        axisStart: document.getElementById('axisStart'),
+        axisMid: document.getElementById('axisMid'),
+        axisEnd: document.getElementById('axisEnd'),
+        subLabel1: document.getElementById('subLabel1'),
+        subValue1: document.getElementById('subValue1'),
+        subLabel2: document.getElementById('subLabel2'),
+        subValue2: document.getElementById('subValue2'),
+        viewDetailsBtn: document.getElementById('viewDetailsBtn'),
+        backToOverviewBtn: document.getElementById('backToOverviewBtn'),
+        detailsView: document.getElementById('detailsView'),
+        detailsRangeBadge: document.getElementById('detailsRangeBadge'),
+        detailAvgSession: document.getElementById('detailAvgSession'),
+        detailRetention: document.getElementById('detailRetention'),
+        channelsList: document.getElementById('channelsList'),
+        detailInsightText: document.getElementById('detailInsightText'),
+        copySummaryBtn: document.getElementById('copySummaryBtn'),
+        copyBtnText: document.getElementById('copyBtnText'),
+        toastMessage: document.getElementById('toastMessage'),
+        toastText: document.getElementById('toastText'),
+        parallaxOrbs: document.querySelectorAll('.parallax-orb'),
+      };
+
+      /* ----------------------------------------------------------------------
+         3. SMOOTH CATMULL-ROM SPLINE MATH & RENDERING
+         Converts normalized points into silky Cubic Bezier paths and allows
+         pinpoint evaluation at any horizontal cursor position.
+         ---------------------------------------------------------------------- */
+      function mapPointsToCoords(points) {
+        const usableW = CHART_W - PAD_LEFT - PAD_RIGHT;
+        const usableH = CHART_H - PAD_TOP - PAD_BOTTOM;
+        const step = usableW / (points.length - 1);
+
+        return points.map((val, idx) => ({
+          x: PAD_LEFT + idx * step,
+          y: PAD_TOP + (1 - val) * usableH,
+        }));
+      }
+
+      /**
+       * Generates an SVG path string using centripetal/uniform Catmull-Rom
+       * converted to cubic Bezier segments for organic liquid curves.
+       */
+      function buildSmoothSplinePath(coords, tension = 0.24) {
+        if (!coords.length) return '';
+        let d = `M ${coords[0].x.toFixed(2)} ${coords[0].y.toFixed(2)}`;
+
+        for (let i = 0; i < coords.length - 1; i++) {
+          const p0 = coords[Math.max(0, i - 1)];
+          const p1 = coords[i];
+          const p2 = coords[i + 1];
+          const p3 = coords[Math.min(coords.length - 1, i + 2)];
+
+          const cp1x = p1.x + (p2.x - p0.x) * tension;
+          const cp1y = p1.y + (p2.y - p0.y) * tension;
+          const cp2x = p2.x - (p3.x - p1.x) * tension;
+          const cp2y = p2.y - (p3.y - p1.y) * tension;
+
+          d += ` C ${cp1x.toFixed(2)} ${cp1y.toFixed(2)}, ${cp2x.toFixed(2)} ${cp2y.toFixed(2)}, ${p2.x.toFixed(2)} ${p2.y.toFixed(2)}`;
+        }
+        return d;
+      }
+
+      /**
+       * Renders the line, glow, gradient area fill, and positions the active
+       * marker and floating frosted tooltip.
+       */
+      function renderChart(points, activeIdx = points.length - 1, showDetailedVal = false) {
+        try {
+          const coords = mapPointsToCoords(points);
+          const lineD = buildSmoothSplinePath(coords, 0.22);
+          const last = coords[coords.length - 1];
+          const first = coords[0];
+          const areaD = `${lineD} L ${last.x.toFixed(2)} ${CHART_H} L ${first.x.toFixed(2)} ${CHART_H} Z`;
+
+          els.linePath.setAttribute('d', lineD);
+          els.glowPath.setAttribute('d', lineD);
+          els.areaPath.setAttribute('d', areaD);
+
+          const clampedIdx = Math.max(0, Math.min(coords.length - 1, activeIdx));
+          const pt = coords[clampedIdx];
+
+          // Move glowing indicator dot
+          els.activeMarker.setAttribute('transform', `translate(${pt.x.toFixed(2)}, ${pt.y.toFixed(2)})`);
+
+          // Update scrubbing vertical guide line
+          els.scrubLine.setAttribute('x1', pt.x.toFixed(2));
+          els.scrubLine.setAttribute('x2', pt.x.toFixed(2));
+          els.scrubLine.setAttribute('y1', pt.y.toFixed(2));
+          els.scrubLine.setAttribute('y2', (CHART_H - 6).toString());
+          els.scrubLine.setAttribute('opacity', state.isScrubbing ? '1' : '0');
+
+          // Position floating glass tooltip relative to SVG coordinate percentages
+          const pctX = (pt.x / CHART_W) * 100;
+          const pctY = (pt.y / CHART_H) * 100;
+
+          // Keep tooltip cleanly inside card bounds even near edges
+          const safeX = Math.max(15, Math.min(82, pctX));
+          const safeTopPx = Math.max(2, (pctY / 100) * els.chartStage.clientHeight - 48);
+
+          els.chartTooltip.style.left = `${safeX}%`;
+          els.chartTooltip.style.top = `${safeTopPx}px`;
+
+          const metricObj = ANALYTICS_DATA[state.metric];
+          const rangeObj = metricObj.ranges[state.range];
+          const dateLabel = rangeObj.dates[clampedIdx] || rangeObj.axis[2];
+          els.tooltipDate.textContent = dateLabel;
+
+          if (showDetailedVal) {
+            // Compute proportional point value anchored to hero figure at peak
+            const peakRatio = rangeObj.points[rangeObj.points.length - 1] || 0.94;
+            const approxVal = (points[clampedIdx] / peakRatio) * rangeObj.hero;
+            els.tooltipValue.textContent = metricObj.formatTooltip(approxVal);
+            els.tooltipValue.classList.remove('hidden');
+          } else {
+            els.tooltipValue.classList.add('hidden');
+          }
+        } catch (err) {
+          console.error('Chart render error:', err);
+        }
+      }
+
+      /* ----------------------------------------------------------------------
+         4. LIQUID MORPH & ANIMATED NUMBER INTERPOLATION
+         ---------------------------------------------------------------------- */
+      function easeOutQuint(t) {
+        return 1 - Math.pow(1 - t, 5);
+      }
+
+      function morphChartTo(targetPoints) {
+        if (state.morphRaf) cancelAnimationFrame(state.morphRaf);
+        const startPoints = [...state.currentPoints];
+        const startTime = performance.now();
+        const duration = 560;
+
+        function frame(now) {
+          const elapsed = now - startTime;
+          const progress = Math.min(1, elapsed / duration);
+          const eased = easeOutQuint(progress);
+
+          const interpolated = startPoints.map((startVal, i) => {
+            const endVal = targetPoints[i];
+            return startVal + (endVal - startVal) * eased;
+          });
+
+          state.currentPoints = interpolated;
+          renderChart(interpolated, state.isScrubbing ? state.scrubIndex : interpolated.length - 1, state.isScrubbing);
+
+          if (progress < 1) {
+            state.morphRaf = requestAnimationFrame(frame);
+          } else {
+            state.currentPoints = [...targetPoints];
+          }
+        }
+
+        state.morphRaf = requestAnimationFrame(frame);
+      }
+
+      function parseCurrentNumber(el) {
+        const cleaned = (el.textContent || '0').replace(/[^0-9.-]/g, '');
+        return parseFloat(cleaned) || 0;
+      }
+
+      function animateMetrics(metricObj, rangeObj) {
+        if (state.numberRaf) cancelAnimationFrame(state.numberRaf);
+
+        const startHero = parseCurrentNumber(els.heroNumber);
+        const startDelta = parseCurrentNumber(els.heroDelta);
+        const startSub1 = parseCurrentNumber(els.subValue1);
+        const startSub2 = parseCurrentNumber(els.subValue2);
+
+        const startTime = performance.now();
+        const duration = 520;
+
+        function step(now) {
+          const t = Math.min(1, (now - startTime) / duration);
+          const e = easeOutQuint(t);
+
+          const curHero = startHero + (rangeObj.hero - startHero) * e;
+          const curDelta = startDelta + (rangeObj.delta - startDelta) * e;
+          const curSub1 = startSub1 + (rangeObj.sub1 - startSub1) * e;
+          const curSub2 = startSub2 + (rangeObj.sub2 - startSub2) * e;
+
+          els.heroNumber.textContent = metricObj.formatHero(curHero);
+          els.heroDelta.textContent = `${curDelta.toFixed(1)}%`;
+
+          if (rangeObj.sub1Currency) {
+            els.subValue1.textContent = '$' + Math.round(curSub1).toLocaleString('en-US');
+          } else if (rangeObj.sub1Decimal) {
+            els.subValue1.textContent = curSub1.toFixed(1);
+          } else {
+            els.subValue1.textContent = Math.round(curSub1).toLocaleString('en-US');
+          }
+
+          els.subValue2.textContent = rangeObj.sub2IsPercent
+            ? `${curSub2.toFixed(1)}%`
+            : Math.round(curSub2).toLocaleString('en-US');
+
+          if (t < 1) {
+            state.numberRaf = requestAnimationFrame(step);
+          }
+        }
+
+        state.numberRaf = requestAnimationFrame(step);
+      }
+
+      /* ----------------------------------------------------------------------
+         5. UPDATE UI ACROSS OVERVIEW & DETAILS DRAWER
+         ---------------------------------------------------------------------- */
+      function populateDetailsView(metricObj, rangeObj) {
+        els.detailsRangeBadge.textContent = `${metricObj.title} · ${state.range}`;
+        els.detailAvgSession.textContent = rangeObj.avgSession;
+        els.detailRetention.textContent = rangeObj.retention;
+        els.detailInsightText.textContent = rangeObj.insight;
+
+        els.channelsList.innerHTML = rangeObj.channels
+          .map(
+            (ch) => `
+            <div class="space-y-1.5">
+              <div class="flex items-center justify-between text-[13px]">
+                <span class="font-medium text-[#1b2740]">${ch.name}</span>
+                <span class="font-bold text-[#141d30] tabular-nums">${ch.pct}%</span>
+              </div>
+              <div class="w-full h-2.5 rounded-full bg-white/70 border border-white/80 overflow-hidden shadow-inner">
+                <div
+                  class="h-full rounded-full bg-gradient-to-r ${ch.grad} transition-all duration-700"
+                  style="width: ${ch.pct}%;"
+                ></div>
+              </div>
+            </div>
+          `
+          )
+          .join('');
+      }
+
+      function updateDashboard(animate = true) {
+        const metricObj = ANALYTICS_DATA[state.metric];
+        const rangeObj = metricObj.ranges[state.range];
+
+        els.cardTitle.textContent = metricObj.title;
+        els.analyticsPillLabel.textContent = metricObj.pillLabel;
+        els.subLabel1.textContent = metricObj.subLabel1;
+        els.subLabel2.textContent = metricObj.subLabel2;
+
+        els.axisStart.textContent = rangeObj.axis[0];
+        els.axisMid.textContent = rangeObj.axis[1];
+        els.axisEnd.textContent = rangeObj.axis[2];
+
+        populateDetailsView(metricObj, rangeObj);
+
+        if (animate) {
+          animateMetrics(metricObj, rangeObj);
+          morphChartTo(rangeObj.points);
+        } else {
+          state.currentPoints = [...rangeObj.points];
+          els.heroNumber.textContent = metricObj.formatHero(rangeObj.hero);
+          els.heroDelta.textContent = `${rangeObj.delta.toFixed(1)}%`;
+          els.subValue1.textContent = Math.round(rangeObj.sub1).toLocaleString('en-US');
+          els.subValue2.textContent = `${rangeObj.sub2.toFixed(1)}%`;
+          renderChart(state.currentPoints, state.currentPoints.length - 1, false);
+        }
+      }
+
+      /* ----------------------------------------------------------------------
+         6. INTERACTIVE EVENTS (Tabs, Scrubbing, Metric Switcher, Drawer, Toast)
+         ---------------------------------------------------------------------- */
+      // Timeframe Tab Switching (7d | 12d | 30d)
+      els.rangeTabs.forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const newRange = btn.dataset.range;
+          const idx = Number(btn.dataset.index);
+          if (newRange === state.range) return;
+
+          state.range = newRange;
+          state.isScrubbing = false;
+          state.scrubIndex = 20;
+
+          // Slide liquid pill smoothly
+          els.activeTabPill.style.transform = `translateX(${idx * 100}%)`;
+
+          els.rangeTabs.forEach((tab) => {
+            const isSelected = tab.dataset.range === newRange;
+            tab.setAttribute('aria-selected', String(isSelected));
+            tab.classList.toggle('text-white', isSelected);
+            tab.classList.toggle('text-[#536480]', !isSelected);
+          });
+
+          updateDashboard(true);
+        });
+      });
+
+      // Metric Popover Toggle ("Analytics" pill)
+      function closeMetricMenu() {
+        els.metricMenu.classList.add('hidden');
+        els.analyticsToggleBtn.setAttribute('aria-expanded', 'false');
+      }
+
+      els.analyticsToggleBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const isHidden = els.metricMenu.classList.contains('hidden');
+        if (isHidden) {
+          els.metricMenu.classList.remove('hidden');
+          els.analyticsToggleBtn.setAttribute('aria-expanded', 'true');
+        } else {
+          closeMetricMenu();
+        }
+      });
+
+      document.addEventListener('click', (e) => {
+        if (!els.metricMenu.contains(e.target) && e.target !== els.analyticsToggleBtn) {
+          closeMetricMenu();
+        }
+      });
+
+      els.metricOptions.forEach((opt) => {
+        opt.addEventListener('click', () => {
+          const selectedMetric = opt.dataset.metric;
+          state.metric = selectedMetric;
+          state.isScrubbing = false;
+          state.scrubIndex = 20;
+
+          // Highlight active menu item
+          els.metricOptions.forEach((item) => {
+            const active = item.dataset.metric === selectedMetric;
+            item.classList.toggle('bg-white/70', active);
+            item.classList.toggle('font-semibold', active);
+            item.classList.toggle('text-[#141d30]', active);
+            item.classList.toggle('text-[#526583]', !active);
+            const dot = item.querySelector('span:last-child');
+            if (dot) {
+              dot.classList.toggle('bg-blue-500', active);
+              dot.classList.toggle('bg-transparent', !active);
+            }
+          });
+
+          closeMetricMenu();
+          updateDashboard(true);
+        });
+      });
+
+      // Interactive Mouse + Touch Chart Scrubbing
+      function handleScrub(clientX) {
+        const rect = els.chartStage.getBoundingClientRect();
+        if (!rect.width) return;
+
+        const relX = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
+        const idx = Math.round(relX * (state.currentPoints.length - 1));
+
+        state.isScrubbing = true;
+        state.scrubIndex = idx;
+        els.scrubHint.style.opacity = '1';
+        renderChart(state.currentPoints, idx, true);
+      }
+
+      function endScrub() {
+        state.isScrubbing = false;
+        state.scrubIndex = state.currentPoints.length - 1;
+        els.scrubHint.style.opacity = '0';
+        renderChart(state.currentPoints, state.scrubIndex, false);
+      }
+
+      els.chartStage.addEventListener('pointermove', (e) => {
+        handleScrub(e.clientX);
+      });
+
+      els.chartStage.addEventListener('pointerdown', (e) => {
+        els.chartStage.setPointerCapture?.(e.pointerId);
+        handleScrub(e.clientX);
+      });
+
+      els.chartStage.addEventListener('pointerleave', () => {
+        endScrub();
+      });
+
+      els.chartStage.addEventListener('pointerup', () => {
+        endScrub();
+      });
+
+      // Expand / Collapse "View details" Liquid Drawer
+      function openDetails() {
+        closeMetricMenu();
+        els.detailsView.classList.remove('details-hidden');
+        els.detailsView.classList.add('details-visible');
+        els.detailsView.setAttribute('aria-hidden', 'false');
+      }
+
+      function closeDetails() {
+        els.detailsView.classList.remove('details-visible');
+        els.detailsView.classList.add('details-hidden');
+        els.detailsView.setAttribute('aria-hidden', 'true');
+      }
+
+      els.viewDetailsBtn.addEventListener('click', openDetails);
+      els.backToOverviewBtn.addEventListener('click', closeDetails);
+
+      // Copy Summary Snapshot (iFrame-safe document.execCommand fallback)
+      function showToast(message) {
+        els.toastText.textContent = message;
+        els.toastMessage.classList.remove('opacity-0', 'translate-y-6');
+        els.toastMessage.classList.add('opacity-100', 'translate-y-0');
+
+        if (state.toastTimer) clearTimeout(state.toastTimer);
+        state.toastTimer = setTimeout(() => {
+          els.toastMessage.classList.remove('opacity-100', 'translate-y-0');
+          els.toastMessage.classList.add('opacity-0', 'translate-y-6');
+        }, 2400);
+      }
+
+      els.copySummaryBtn.addEventListener('click', () => {
+        try {
+          const metricObj = ANALYTICS_DATA[state.metric];
+          const rangeObj = metricObj.ranges[state.range];
+          const summaryText =
+            `${metricObj.title} (${state.range}) — ${metricObj.formatHero(rangeObj.hero)} (+${rangeObj.delta}%) | ` +
+            `${metricObj.subLabel1}: ${els.subValue1.textContent} | ${metricObj.subLabel2}: ${els.subValue2.textContent}`;
+
+          const textarea = document.createElement('textarea');
+          textarea.value = summaryText;
+          textarea.setAttribute('readonly', '');
+          textarea.style.position = 'fixed';
+          textarea.style.left = '-9999px';
+          document.body.appendChild(textarea);
+          textarea.select();
+          document.execCommand('copy');
+          document.body.removeChild(textarea);
+
+          els.copyBtnText.textContent = 'Snapshot copied!';
+          showToast('Analytics snapshot copied to clipboard');
+          setTimeout(() => {
+            els.copyBtnText.textContent = 'Copy analytics snapshot';
+          }, 2000);
+        } catch (err) {
+          console.error('Copy error:', err);
+          showToast('Unable to copy snapshot');
+        }
+      });
+
+      /* ----------------------------------------------------------------------
+         7. SUBTLE SPECULAR LIGHTING & BACKGROUND ORB PARALLAX (Desktop)
+         ---------------------------------------------------------------------- */
+      els.card.addEventListener('mousemove', (e) => {
+        const rect = els.card.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        els.sheen.style.setProperty('--mx', `${x}px`);
+        els.sheen.style.setProperty('--my', `${y}px`);
+      });
+
+      window.addEventListener('mousemove', (e) => {
+        const cx = e.clientX - window.innerWidth / 2;
+        const cy = e.clientY - window.innerHeight / 2;
+
+        els.parallaxOrbs.forEach((orb) => {
+          const depth = parseFloat(orb.dataset.depth || '0.02');
+          orb.style.marginLeft = `${(-cx * depth).toFixed(1)}px`;
+          orb.style.marginTop = `${(-cy * depth).toFixed(1)}px`;
+        });
+      });
+
+      // Keep tooltip accurately aligned when viewport resizes
+      window.addEventListener('resize', () => {
+        renderChart(state.currentPoints, state.isScrubbing ? state.scrubIndex : state.currentPoints.length - 1, state.isScrubbing);
+      });
+
+      /* ----------------------------------------------------------------------
+         8. INITIAL RENDER
+         ---------------------------------------------------------------------- */
+      window.addEventListener('DOMContentLoaded', () => {
+        updateDashboard(false);
+      });
+    })();
+  </script>
+</body>
+</html>
