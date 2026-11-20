@@ -182,7 +182,7 @@ export const DeveloperHubPanel = memo(function DeveloperHubPanel({
                     : 'text-sky-200'
                 }
               >
-                <span className="text-slate-400 tabular-nums mr-2">[{entry.time}]</span>
+                <span suppressHydrationWarning className="text-slate-400 tabular-nums mr-2">[{entry.time}]</span>
                 <span>{entry.message}</span>
               </div>
             ))

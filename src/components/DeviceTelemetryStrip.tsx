@@ -126,6 +126,17 @@ function detectClientSpecs(): ClientHardwareSpecs {
   };
 }
 
+const INITIAL_SPECS: ClientHardwareSpecs = {
+  osName: 'Desktop PC',
+  deviceType: 'Desktop',
+  browserName: 'Browser',
+  isMobile: false,
+  screenRes: '1920 × 1080',
+  cpuCores: '8 Cores',
+  memoryRam: 'System Managed',
+  networkType: 'Online',
+};
+
 const GAUGE_CIRC = 2 * Math.PI * 22; // r=22 -> 138.23
 
 export const DeviceTelemetryStrip = memo(function DeviceTelemetryStrip({
@@ -141,7 +152,7 @@ export const DeviceTelemetryStrip = memo(function DeviceTelemetryStrip({
   const [publicIp, setPublicIp] = useState<string>('Resolving...');
   const [ipLocation, setIpLocation] = useState<string>('Detecting location');
   const [rttMs, setRttMs] = useState<number | null>(null);
-  const [specs, setSpecs] = useState<ClientHardwareSpecs>(() => detectClientSpecs());
+  const [specs, setSpecs] = useState<ClientHardwareSpecs>(INITIAL_SPECS);
 
   // Battery API
   useEffect(() => {
@@ -222,8 +233,9 @@ export const DeviceTelemetryStrip = memo(function DeviceTelemetryStrip({
     };
   }, []);
 
-  // Update screen specs on resize
+  // Update screen specs on mount and resize
   useEffect(() => {
+    setSpecs(detectClientSpecs());
     const onResize = () => setSpecs(detectClientSpecs());
     window.addEventListener('resize', onResize);
     return () => window.removeEventListener('resize', onResize);
@@ -343,10 +355,16 @@ export const DeviceTelemetryStrip = memo(function DeviceTelemetryStrip({
 
           <div className="flex items-end justify-between gap-2 mt-3">
             <div className="min-w-0">
-              <div className="text-[17px] sm:text-[19px] font-extrabold text-[#141d30] leading-tight truncate">
+              <div
+                suppressHydrationWarning
+                className="text-[17px] sm:text-[19px] font-extrabold text-[#141d30] leading-tight truncate"
+              >
                 {specs.osName}
               </div>
-              <div className="text-[11.5px] font-medium text-[#526582] mt-1.5 truncate">
+              <div
+                suppressHydrationWarning
+                className="text-[11.5px] font-medium text-[#526582] mt-1.5 truncate"
+              >
                 {specs.browserName} · {specs.deviceType}
               </div>
             </div>
@@ -447,6 +465,7 @@ export const DeviceTelemetryStrip = memo(function DeviceTelemetryStrip({
               <div className="min-w-0">
                 <div className="text-[11px] font-semibold text-[#5a6f8e]">{label}</div>
                 <div
+                  suppressHydrationWarning
                   title={value}
                   className={`text-[12.5px] font-bold text-[#141d30] truncate ${
                     mono ? 'font-mono tabular-nums' : ''

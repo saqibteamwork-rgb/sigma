@@ -53,16 +53,16 @@ export default function App() {
   const [profile, setProfile] = useState<CreatorProfile>(DEFAULT_CREATOR_PROFILE);
   const [mobileTab, setMobileTab] = useState<MobileSection>('pair');
   const [toastMessage, setToastMessage] = useState<string | null>(null);
-  const [logs, setLogs] = useState<ConsoleLogEntry[]>(() => [
+  const [logs, setLogs] = useState<ConsoleLogEntry[]>([
     {
       id: 'init-1',
-      time: nowTimeStr(),
+      time: 'Live',
       message: 'SIGMA MD Liquid Glass Bot Hub initialized.',
       level: 'success',
     },
     {
       id: 'init-2',
-      time: nowTimeStr(),
+      time: 'Ready',
       message: 'Enter your WhatsApp number above to request an 8-digit pairing code.',
       level: 'info',
     },
