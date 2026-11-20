@@ -289,7 +289,7 @@ export function PairingHeroCard({
       id="pair-workspace"
       ref={cardRef}
       onMouseMove={handleMouseMove}
-      className="liquid-card rounded-[26px] sm:rounded-[34px] p-4 sm:p-7 flex flex-col justify-between h-full overflow-hidden"
+      className="liquid-hero-card rounded-[26px] sm:rounded-[34px] p-4 sm:p-7 flex flex-col justify-between h-full overflow-hidden"
     >
       <div className="specular-sheen" />
 

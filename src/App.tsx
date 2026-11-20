@@ -486,7 +486,7 @@ export default function App() {
                   <button
                     type="button"
                     onClick={() => handleSwitchMobileTab('cluster')}
-                    className="liquid-card min-h-[68px] rounded-[20px] p-3.5 text-left flex items-center justify-between gap-2 active:scale-[0.97] transition-transform cursor-pointer"
+                    className="liquid-hero-card min-h-[68px] rounded-[20px] p-3.5 text-left flex items-center justify-between gap-2 active:scale-[0.97] transition-transform cursor-pointer"
                   >
                     <div className="min-w-0">
                       <div className="text-[11px] font-semibold text-[#526582]">Active Route</div>
@@ -503,7 +503,7 @@ export default function App() {
                   <button
                     type="button"
                     onClick={() => handleSwitchMobileTab('commands')}
-                    className="liquid-card min-h-[68px] rounded-[20px] p-3.5 text-left flex items-center justify-between gap-2 active:scale-[0.97] transition-transform cursor-pointer"
+                    className="liquid-hero-card min-h-[68px] rounded-[20px] p-3.5 text-left flex items-center justify-between gap-2 active:scale-[0.97] transition-transform cursor-pointer"
                   >
                     <div className="min-w-0">
                       <div className="text-[11px] font-semibold text-[#526582]">Bot Commands</div>

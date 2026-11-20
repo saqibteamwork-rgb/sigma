@@ -41,7 +41,7 @@ export const ClusterRouterPanel = memo(function ClusterRouterPanel({
       id="cluster-panel"
       ref={cardRef}
       onMouseMove={handleMouseMove}
-      className="liquid-card rounded-[28px] sm:rounded-[34px] p-5 sm:p-6 flex flex-col justify-between h-full overflow-hidden"
+      className="liquid-hero-card rounded-[28px] sm:rounded-[34px] p-5 sm:p-6 flex flex-col justify-between h-full overflow-hidden"
     >
       <div className="specular-sheen" />
 
