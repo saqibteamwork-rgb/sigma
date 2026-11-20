@@ -14,6 +14,7 @@ import {
 } from './data/botHubData';
 import { HOME_SEO_META, SEO_PAGES, SeoRoutePath } from './data/seoPagesData';
 import { AmbientOrbs } from './components/AmbientOrbs';
+import { AmbientNavbarWallpaper } from './components/AmbientNavbarWallpaper';
 import { PairingHeroCard } from './components/PairingHeroCard';
 import { ClusterRouterPanel } from './components/ClusterRouterPanel';
 import { sweepClusterHealthDirect } from './lib/botClusterClient';
@@ -268,6 +269,9 @@ export default function App() {
     <div className="min-h-dvh w-full relative flex flex-col selection:bg-blue-500/20 selection:text-blue-900">
       {/* Signature Liquid Glass Ambient Orbs */}
       <AmbientOrbs />
+
+      {/* Atmospheric Top Navbar Living Wallpaper Animation */}
+      <AmbientNavbarWallpaper />
 
       {/* Desktop Top Navigation Bar (Strict 3-Zone Contract — Main UI stays clean) */}
       <header className="hidden lg:block relative z-20 w-full max-w-6xl mx-auto px-8 pt-6 pb-2">
