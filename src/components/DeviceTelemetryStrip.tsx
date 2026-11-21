@@ -248,7 +248,10 @@ export const DeviceTelemetryStrip = memo(function DeviceTelemetryStrip({
   const uptimeOffset = GAUGE_CIRC * (1 - uptimePct / 100);
 
   return (
-    <section id="device-telemetry" className="cv-auto space-y-4">
+    <section id="device-telemetry" aria-labelledby="telemetry-heading" className="cv-auto space-y-4">
+      <h2 id="telemetry-heading" className="sr-only">
+        Live Client Device Telemetry & Node Cluster Health
+      </h2>
       {/* 4-Column Liquid Glass Radial Telemetry KPIs */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         {/* KPI 1: Battery */}

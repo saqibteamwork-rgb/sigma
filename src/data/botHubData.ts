@@ -189,4 +189,4 @@ export const DEFAULT_CREATOR_PROFILE: CreatorProfile = {
 };
 
 export const DEVELOPER_AVATAR_URL =
-  '/src/assets/images/saqib_developer_avatar_1795165846673.jpg';
+  '/assets/images/saqib_developer_avatar.jpg';

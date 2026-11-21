@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180" width="180" height="180">
+  <defs>
+    <linearGradient id="appleSigmaGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3b5bfd"/>
+      <stop offset="55%" stop-color="#1d86ff"/>
+      <stop offset="100%" stop-color="#0ec89c"/>
+    </linearGradient>
+  </defs>
+  <rect width="180" height="180" rx="42" fill="url(#appleSigmaGrad)"/>
+  <rect x="3" y="3" width="174" height="174" rx="39" fill="none" stroke="#ffffff" stroke-opacity="0.35" stroke-width="6"/>
+  <text x="90" y="128" font-family="'Plus Jakarta Sans', system-ui, -apple-system, sans-serif" font-size="105" font-weight="900" fill="#ffffff" text-anchor="middle">Σ</text>
+</svg>
